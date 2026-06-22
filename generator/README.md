@@ -1,4 +1,4 @@
-# A2A Python SDK — Samples
+# A2A Python Mock Generator
 
 This directory contains runnable examples demonstrating how to build and interact with an A2A-compliant agent using the Python SDK.
 
@@ -32,27 +32,3 @@ Demonstrates:
 uv run python true_agent_50001.py
 ```
 
----
-
-## `cli.py` — Client
-
-An interactive terminal client with full visibility into the streaming event flow. Each `TaskStatusUpdate` and `TaskArtifactUpdate` event is printed as it arrives.
-
-Features:
-- Transport selection via `--transport` flag (`JSONRPC`, `HTTP+JSON`, `GRPC`)
-- Session management (`context_id` persisted across messages, `task_id` per task)
-- Graceful error handling for HTTP and gRPC failures
-
-**Run:**
-
-```bash
-# Connect to the local hello_world_agent (default):
-uv run python cli_41241.py
-
-# Connect to a different URL, using gRPC:
-uv run python cli_41241.py --url http://192.168.1.10:41241 --transport GRPC
-```
-
-Then type a message like `hello` and press Enter.
-
-Type `/quit` or `/exit` to stop, or press `Ctrl+C`.

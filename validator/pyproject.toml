@@ -1,7 +1,7 @@
 [project]
-name = "mock-helloworld"
+name = "mock-evaluator"
 
-description = "Mock"
+description = "Mock Evaluators"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
