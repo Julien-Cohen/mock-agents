@@ -122,6 +122,7 @@ class SampleAgentExecutor(AgentExecutor):
 
     def _generate(self, query: str) -> str:
         self.counter += 1
+        logger.info("Received the following request: " + query)
         return f"Generated result #{self.counter}."
 
 async def serve(
