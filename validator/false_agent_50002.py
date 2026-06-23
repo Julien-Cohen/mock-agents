@@ -109,7 +109,7 @@ class SampleAgentExecutor(AgentExecutor):
 
         await updater.add_artifact(
             parts=[Part(text=agent_reply_text)],
-            name='response',
+            name='evaluation',
             last_chunk=True,
         )
         await updater.complete()
