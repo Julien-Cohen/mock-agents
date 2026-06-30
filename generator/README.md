@@ -2,6 +2,16 @@
 
 This directory contains runnable examples demonstrating how to build and interact with an A2A-compliant agent using the Python SDK.
 
+```bash
+docker build . -t mock-generator:latest
+```
+
+
+```bash
+docker run -p 41241:41241 -p 41242:41242 mock-generator:latest
+```
+
+# FIXME
 ## Contents
 
 | File | Role | Description |

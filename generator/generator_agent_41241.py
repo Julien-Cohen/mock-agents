@@ -126,7 +126,7 @@ class SampleAgentExecutor(AgentExecutor):
         return f"Generated result #{self.counter}."
 
 async def serve(
-        bind_host = '127.0.0.1',
+        bind_host = '0.0.0.0',
     host: str = '127.0.0.1',
     port: int = 41241,
     grpc_port: int = 41242,
