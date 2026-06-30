@@ -252,8 +252,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Sample A2A agent server')
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('--port', type=int, default=50002)
-    parser.add_argument('--grpc-port', type=int, default=50051)
-    parser.add_argument('--compat-grpc-port', type=int, default=50052)
+    parser.add_argument('--grpc-port', type=int, default=50053)
+    parser.add_argument('--compat-grpc-port', type=int, default=50054)
     args = parser.parse_args()
     with contextlib.suppress(KeyboardInterrupt):
         asyncio.run(

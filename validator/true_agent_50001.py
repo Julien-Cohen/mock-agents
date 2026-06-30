@@ -126,8 +126,8 @@ class SampleAgentExecutor(AgentExecutor):
 async def serve(
     host: str = '127.0.0.1',
     port: int = 50001,
-    grpc_port: int = 50051,
-    compat_grpc_port: int = 50052,
+    grpc_port: int = 50061,
+    compat_grpc_port: int = 50062,
 ) -> None:
     """Run the Sample Agent server with mounted JSON-RPC, HTTP+JSON and gRPC transports."""
     agent_card = AgentCard(

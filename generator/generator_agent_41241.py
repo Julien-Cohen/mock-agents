@@ -126,10 +126,11 @@ class SampleAgentExecutor(AgentExecutor):
         return f"Generated result #{self.counter}."
 
 async def serve(
+        bind_host = '127.0.0.1',
     host: str = '127.0.0.1',
     port: int = 41241,
-    grpc_port: int = 50051,
-    compat_grpc_port: int = 50052,
+    grpc_port: int = 41242,
+    compat_grpc_port: int = 41243,
 ) -> None:
     """Run the Sample Agent server with mounted JSON-RPC, HTTP+JSON and gRPC transports."""
     agent_card = AgentCard(
@@ -218,18 +219,18 @@ async def serve(
     )
 
     grpc_server = grpc.aio.server()
-    grpc_server.add_insecure_port(f'{host}:{grpc_port}')
+    grpc_server.add_insecure_port(f'{bind_host}:{grpc_port}')
     servicer = GrpcHandler(request_handler)
     a2a_pb2_grpc.add_A2AServiceServicer_to_server(servicer, grpc_server)
 
     compat_grpc_server = grpc.aio.server()
-    compat_grpc_server.add_insecure_port(f'{host}:{compat_grpc_port}')
+    compat_grpc_server.add_insecure_port(f'{bind_host}:{compat_grpc_port}')
     compat_servicer = CompatGrpcHandler(request_handler)
     a2a_v0_3_pb2_grpc.add_A2AServiceServicer_to_server(
         compat_servicer, compat_grpc_server
     )
 
-    config = uvicorn.Config(app, host=host, port=port)
+    config = uvicorn.Config(app, host=bind_host, port=port)
     uvicorn_server = uvicorn.Server(config)
 
     logger.info('Starting Sample Agent servers:')
