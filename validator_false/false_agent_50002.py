@@ -121,13 +121,14 @@ class SampleAgentExecutor(AgentExecutor):
 
     def _evaluate(self, query: str) -> str:
         logger.info("I was requested to evaluate this: " + query)
-        return str(True)
+        return str(False)
 
 async def serve(
+        bind_host = '0.0.0.0',
     host: str = '127.0.0.1',
-    port: int = 50001,
-    grpc_port: int = 50061,
-    compat_grpc_port: int = 50062,
+    port: int = 50002,
+    grpc_port: int = 50051,
+    compat_grpc_port: int = 50052,
 ) -> None:
     """Run the Sample Agent server with mounted JSON-RPC, HTTP+JSON and gRPC transports."""
     agent_card = AgentCard(
@@ -146,7 +147,7 @@ async def serve(
             AgentSkill(
                 id='evaluation',
                 name='Mock Agent Evaluation',
-                description='Gives positive evaluations (always true)',
+                description='Gives negative evaluations (always false)',
                 tags=['mock', 'evaluation'],
                 examples=['evaluate something'],
                 input_modes=['text'],
@@ -216,18 +217,18 @@ async def serve(
     )
 
     grpc_server = grpc.aio.server()
-    grpc_server.add_insecure_port(f'{host}:{grpc_port}')
+    grpc_server.add_insecure_port(f'{bind_host}:{grpc_port}')
     servicer = GrpcHandler(request_handler)
     a2a_pb2_grpc.add_A2AServiceServicer_to_server(servicer, grpc_server)
 
     compat_grpc_server = grpc.aio.server()
-    compat_grpc_server.add_insecure_port(f'{host}:{compat_grpc_port}')
+    compat_grpc_server.add_insecure_port(f'{bind_host}:{compat_grpc_port}')
     compat_servicer = CompatGrpcHandler(request_handler)
     a2a_v0_3_pb2_grpc.add_A2AServiceServicer_to_server(
         compat_servicer, compat_grpc_server
     )
 
-    config = uvicorn.Config(app, host=host, port=port)
+    config = uvicorn.Config(app, host=bind_host, port=port)
     uvicorn_server = uvicorn.Server(config)
 
     logger.info('Starting Sample Agent servers:')
@@ -251,9 +252,9 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description='Sample A2A agent server')
     parser.add_argument('--host', default='127.0.0.1')
-    parser.add_argument('--port', type=int, default=50001)
-    parser.add_argument('--grpc-port', type=int, default=50051)
-    parser.add_argument('--compat-grpc-port', type=int, default=50052)
+    parser.add_argument('--port', type=int, default=50002)
+    parser.add_argument('--grpc-port', type=int, default=50053)
+    parser.add_argument('--compat-grpc-port', type=int, default=50054)
     args = parser.parse_args()
     with contextlib.suppress(KeyboardInterrupt):
         asyncio.run(
