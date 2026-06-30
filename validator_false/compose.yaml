@@ -1,0 +1,6 @@
+services:
+  mock-generator:
+    build: .
+    ports:
+      - "50002:50002"
+      - "50051:50051"

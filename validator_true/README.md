@@ -11,6 +11,12 @@ docker build . -t mock-true-validator:latest
 docker run -p 50001:50001 -p 50061:50061 mock-true-validator:latest
 ```
 
+
+Or:
+```bash
+docker compose up
+```
+
 # fixme
 ## Contents
 

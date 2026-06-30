@@ -6,10 +6,15 @@ This directory contains runnable examples demonstrating how to build and interac
 docker build . -t mock-generator:latest
 ```
 
-
 ```bash
 docker run -p 41241:41241 -p 41242:41242 mock-generator:latest
 ```
+
+Or:
+```bash
+docker compose up
+```
+
 
 # FIXME
 ## Contents

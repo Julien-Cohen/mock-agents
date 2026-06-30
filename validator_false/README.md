@@ -12,6 +12,12 @@ docker build . -t mock-false-validator:latest
 docker run -p 50002:50002 -p 50051:50051 mock-false-validator:latest
 ```
 
+
+Or:
+```bash
+docker compose up
+```
+
 # FIXME
 ## Contents
 
