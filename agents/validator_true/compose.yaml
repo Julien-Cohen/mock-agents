@@ -1,5 +1,5 @@
 services:
-  mock-generator:
+  mock-validator-true:
     build: .
     ports:
       - "50001:50001"

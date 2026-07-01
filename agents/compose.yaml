@@ -1,0 +1,4 @@
+include:
+  - path: ./generator/compose.yaml
+  - path: ./validator_true/compose.yaml
+  - path: ./validator_false/compose.yaml
