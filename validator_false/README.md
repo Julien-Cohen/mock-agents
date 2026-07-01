@@ -7,11 +7,9 @@ This directory contains runnable examples demonstrating how to build and interac
 docker build . -t mock-false-validator:latest
 ```
 
-
 ```bash
 docker run -p 50002:50002 -p 50051:50051 mock-false-validator:latest
 ```
-
 
 Or:
 ```bash
