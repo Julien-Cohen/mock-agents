@@ -79,6 +79,12 @@ class SampleAgentExecutor(AgentExecutor):
             context_id,
         )
 
+        try:
+            logger.info("[MOSAICO METADATA] %s",
+                        user_message.metadata["https://mosaico-project.eu/extensions/mosaico-observability"])
+        except Exception:
+            logger.info("(no Mosaico metadata")
+
         await event_queue.enqueue_event(
             Task(
                 id=task_id,
@@ -118,6 +124,7 @@ class SampleAgentExecutor(AgentExecutor):
             '[SampleAgentExecutor] Task %s finished with state: completed',
             task_id,
         )
+
 
     def _evaluate(self, query: str) -> str:
         logger.info("I was requested to evaluate this: " + query)

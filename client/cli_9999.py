@@ -111,15 +111,19 @@ async def main() -> None:
         if not user_input.strip():
             continue
 
+        test_metadata = {'https://mosaico-project.eu/extensions/mosaico-observability': {'mosaico-super-task-id': "1",
+                                                                                         'mosaico-root-task-id': "2",
+                                                                                         'mosaico-root-task-name': "3"}}
         message = Message(
             role=Role.ROLE_USER,
             message_id=str(uuid.uuid4()),
-            parts=[Part(text=user_input)],
+            parts=[Part(text=user_input, metadata=test_metadata)],
             task_id=current_task_id,
             context_id=current_context_id,
+            metadata=test_metadata
         )
 
-        request = SendMessageRequest(message=message)
+        request = SendMessageRequest(message=message, metadata= test_metadata)
 
         try:
             call_context = ClientCallContext(timeout=60)

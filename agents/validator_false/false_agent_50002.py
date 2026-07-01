@@ -78,6 +78,11 @@ class SampleAgentExecutor(AgentExecutor):
             task_id,
             context_id,
         )
+        try:
+            logger.info("[MOSAICO METADATA] %s",
+                        user_message.metadata["https://mosaico-project.eu/extensions/mosaico-observability"])
+        except Exception:
+            logger.info("(no Mosaico metadata")
 
         await event_queue.enqueue_event(
             Task(
