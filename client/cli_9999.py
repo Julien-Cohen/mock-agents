@@ -126,7 +126,7 @@ async def main() -> None:
         request = SendMessageRequest(message=message, metadata= test_metadata)
 
         try:
-            call_context = ClientCallContext(timeout=60)
+            call_context = ClientCallContext(timeout=60*10)
             stream = client.send_message(request, context=call_context)
             current_task_id = await _handle_stream(stream, current_task_id)
         except (httpx.RequestError, grpc.RpcError) as e:

@@ -5,4 +5,5 @@ RUN pip install -r requirements.txt
 
 COPY cli_9999.py ./
 ENTRYPOINT ["python", "./cli_9999.py"]
-CMD ["--url=http://host.docker.internal:9999" ]
+CMD ["--url=http://host.docker.internal:12000" ]
+#CMD ["--url=http://host.docker.internal:9000" ]
