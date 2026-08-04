@@ -2,9 +2,11 @@ import argparse
 import asyncio
 import contextlib
 import logging
+import uuid
 
 import grpc
 import uvicorn
+from a2a.helpers import new_data_part
 
 from fastapi import FastAPI
 
@@ -32,9 +34,10 @@ from a2a.types import (
     Task,
     TaskState,
     TaskStatus,
-    a2a_pb2_grpc,
+    a2a_pb2_grpc, Artifact, TaskArtifactUpdateEvent,
 )
 
+MOSAICO_OBSERVABILITY = "https://mosaico-project.eu/extensions/mosaico-observability"
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +46,6 @@ class SampleAgentExecutor(AgentExecutor):
 
     def __init__(self) -> None:
         self.running_tasks: set[str] = set()
-        self.counter = 0
 
     async def cancel(
         self, context: RequestContext, event_queue: EventQueue
@@ -68,7 +70,15 @@ class SampleAgentExecutor(AgentExecutor):
         task_id = context.task_id
         context_id = context.context_id
 
+        print("TASK ID = " + task_id)
+        print("CONTEXT ID = " + context_id)
+
+        task = context.current_task
+
         if not user_message or not task_id or not context_id:
+            logger.info(
+                '[SampleAgentExecutor] Abort',
+            )
             return
 
         self.running_tasks.add(task_id)
@@ -80,19 +90,19 @@ class SampleAgentExecutor(AgentExecutor):
             context_id,
         )
 
-        try:
-            logger.info("[MOSAICO METADATA] %s", user_message.metadata["https://mosaico-project.eu/extensions/mosaico-observability"])
-        except Exception:
-            logger.info("(no Mosaico metadata")
+        if (MOSAICO_OBSERVABILITY in user_message.metadata):
+            print(user_message.metadata[MOSAICO_OBSERVABILITY])
+        else:
+            print("(no Mosaico metadata)")
 
-        await event_queue.enqueue_event(
-            Task(
+        if not task:
+            task = Task(
                 id=task_id,
                 context_id=context_id,
                 status=TaskStatus(state=TaskState.TASK_STATE_SUBMITTED),
                 history=[user_message],
             )
-        )
+            await event_queue.enqueue_event(task)
 
         updater = TaskUpdater(
             event_queue=event_queue,
@@ -100,24 +110,44 @@ class SampleAgentExecutor(AgentExecutor):
             context_id=context_id,
         )
 
-        working_message = updater.new_agent_message(
-            parts=[Part(text='Processing your question...')]
-        )
-        await updater.start_work(message=working_message)
+        #working_message = updater.new_agent_message(
+        #    parts=[Part(text='Processing your question...')]
+        #)
+        #await updater.start_work(message=working_message)
 
-        query = context.get_user_input()
 
-        agent_reply_text = self._generate(query)
-        await asyncio.sleep(1)
+        #await asyncio.sleep(1)
 
         if task_id not in self.running_tasks:
+            logger.info(
+                '[SampleAgentExecutor] Task Error',
+            )
             return
 
-        await updater.add_artifact(
-            parts=[Part(text=agent_reply_text)],
-            name='solution',
-            last_chunk=True,
+        # Create evaluation artifact with data Part
+        evaluation_artifact = Artifact(
+            artifact_id=str(uuid.uuid4()),
+            name='evaluation',
+            parts=[new_data_part({"accepted": False})],
         )
+        await event_queue.enqueue_event(TaskArtifactUpdateEvent(
+            context_id=task.context_id,
+            task_id=task.id,
+            artifact=evaluation_artifact,
+        ))
+
+        # Create explanation artifact with text Part
+        explanation_artifact = Artifact(
+            artifact_id=str(uuid.uuid4()),
+            name='explanation',
+            parts=[Part(text="This is bad to me.")],
+        )
+        await event_queue.enqueue_event(TaskArtifactUpdateEvent(
+            context_id=task.context_id,
+            task_id=task.id,
+            artifact=explanation_artifact,
+        ))
+
         await updater.complete()
 
         logger.info(
@@ -125,22 +155,19 @@ class SampleAgentExecutor(AgentExecutor):
             task_id,
         )
 
-    def _generate(self, query: str) -> str:
-        self.counter += 1
-        logger.info("Received the following request: " + query)
-        return f"Generated result #{self.counter}."
+
 
 async def serve(
         bind_host = '0.0.0.0',
     host: str = '127.0.0.1',
-    port: int = 41241,
-    grpc_port: int = 41242,
-    compat_grpc_port: int = 41243,
+    port: int = 9000,
+    grpc_port: int = 50071,
+    compat_grpc_port: int = 50072,
 ) -> None:
     """Run the Sample Agent server with mounted JSON-RPC, HTTP+JSON and gRPC transports."""
     agent_card = AgentCard(
-        name='Mock Generator Agent',
-        description='A mock agent to test collaboration.',
+        name='Mock Evaluator Agent',
+        description='A mock agent to test collaboration, returning false.',
         provider=AgentProvider(
             organization='A2A Samples', url='https://example.com'
         ),
@@ -152,11 +179,11 @@ async def serve(
         default_output_modes=['text', 'task-status'],
         skills=[
             AgentSkill(
-                id='generation',
-                name='Mock Agent Generation',
-                description='Generate random strings',
-                tags=['mock', 'generation'],
-                examples=['generate something'],
+                id='evaluation',
+                name='Mock Agent Evaluation',
+                description='Gives negative evaluations (always false)',
+                tags=['mock', 'evaluation'],
+                examples=['evaluate something'],
                 input_modes=['text'],
                 output_modes=['text', 'task-status'],
             )
@@ -259,9 +286,9 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description='Sample A2A agent server')
     parser.add_argument('--host', default='127.0.0.1')
-    parser.add_argument('--port', type=int, default=41241)
-    parser.add_argument('--grpc-port', type=int, default=50051)
-    parser.add_argument('--compat-grpc-port', type=int, default=50052)
+    parser.add_argument('--port', type=int, default=9000)
+    parser.add_argument('--grpc-port', type=int, default=50071)
+    parser.add_argument('--compat-grpc-port', type=int, default=50072)
     args = parser.parse_args()
     with contextlib.suppress(KeyboardInterrupt):
         asyncio.run(

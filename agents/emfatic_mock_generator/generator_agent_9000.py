@@ -154,7 +154,7 @@ async def serve(
 ) -> None:
     """Run the Sample Agent server with mounted JSON-RPC, HTTP+JSON and gRPC transports."""
     agent_card = AgentCard(
-        name='Mock Evaluator Agent',
+        name='Mock Generator Agent',
         description='A mock agent to test collaboration.',
         provider=AgentProvider(
             organization='A2A Samples', url='https://example.com'
@@ -168,8 +168,8 @@ async def serve(
         skills=[
             AgentSkill(
                 id='evaluation',
-                name='Mock Agent Evaluation',
-                description='Gives positive evaluations (always true)',
+                name='Mock Agent Generation',
+                description='Gives some emfatic code (always the same)',
                 tags=['mock', 'evaluation'],
                 examples=['evaluate something'],
                 input_modes=['text'],

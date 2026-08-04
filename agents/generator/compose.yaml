@@ -1,6 +1,0 @@
-services:
-  mock-generator:
-    build: .
-    ports:
-      - "41241:41241"
-      - "41242:41242"
