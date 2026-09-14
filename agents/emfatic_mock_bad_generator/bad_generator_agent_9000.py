@@ -253,7 +253,7 @@ async def serve(
     config = uvicorn.Config(app, host=bind_host, port=port)
     uvicorn_server = uvicorn.Server(config)
 
-    logger.info('Starting Sample Agent servers:')
+    logger.info('Starting Agent servers:')
     logger.info(' - HTTP on http://%s:%s', host, port)
     logger.info(' - gRPC on %s:%s', host, grpc_port)
     logger.info(' - gRPC (v0.3 compat) on %s:%s', host, compat_grpc_port)
@@ -272,7 +272,7 @@ async def serve(
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    parser = argparse.ArgumentParser(description='Sample A2A agent server')
+    parser = argparse.ArgumentParser(description='A2A agent server')
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('--port', type=int, default=9000)
     parser.add_argument('--grpc-port', type=int, default=50071)
