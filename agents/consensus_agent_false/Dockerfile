@@ -4,8 +4,8 @@ COPY requirements.txt ./
 RUN pip install -r requirements.txt
 
 COPY __init__.py ./
-COPY true_agent_9000.py ./
+COPY false_agent_9000.py ./
 
 EXPOSE 9000
 
-CMD [ "python", "./true_agent_9000.py", "--host=consensus-agent" ]
+CMD [ "python", "./false_agent_9000.py", "--host=consensus-agent" ]

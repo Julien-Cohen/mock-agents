@@ -14,6 +14,6 @@ docker run -p 9000:9000 -p 50071:50071 mock-false-consensus-agent:latest
 **Run:**
 
 ```bash
-uv run python true_agent_9000.py
+uv run python false_agent_9000.py
 ```
 
