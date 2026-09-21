@@ -128,7 +128,7 @@ class SampleAgentExecutor(AgentExecutor):
         evaluation_artifact = Artifact(
             artifact_id=str(uuid.uuid4()),
             name='evaluation',
-            parts=[new_data_part({"accepted": True})],
+            parts=[new_data_part({"accepted": False})],
         )
         await event_queue.enqueue_event(TaskArtifactUpdateEvent(
             context_id=task.context_id,
@@ -140,7 +140,7 @@ class SampleAgentExecutor(AgentExecutor):
         explanation_artifact = Artifact(
             artifact_id=str(uuid.uuid4()),
             name='explanation',
-            parts=[Part(text="The consensus is good to me.")],
+            parts=[Part(text="The consensus is negative to me.")],
         )
         await event_queue.enqueue_event(TaskArtifactUpdateEvent(
             context_id=task.context_id,
@@ -166,8 +166,8 @@ async def serve(
 ) -> None:
     """Run the Consensus Agent server with mounted JSON-RPC, HTTP+JSON and gRPC transports."""
     agent_card = AgentCard(
-        name='Mock Consensus Agent (positive)',
-        description='A mock agent to test consensus (positive).',
+        name='Mock Consensus Agent (negative)',
+        description='A mock agent to test consensus (negative).',
         provider=AgentProvider(
             organization='A2A MOSAICO Samples', url='https://example.com'
         ),
@@ -180,8 +180,8 @@ async def serve(
         skills=[
             AgentSkill(
                 id='consensus',
-                name='Mock Consensus Agent (positive)',
-                description='Gives positive result to consensus (always true)',
+                name='Mock Consensus Agent (negative)',
+                description='Gives negative result to consensus (always false)',
                 tags=['mock', 'consensus'],
                 examples=['decide something'],
                 input_modes=['text'],
