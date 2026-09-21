@@ -1,12 +1,12 @@
 # A2A Python Mock Consensus Agent
 
 ```bash
-docker build . -t mock-true-consensus-agent:latest
+docker build . -t mock-false-consensus-agent:latest
 ```
 
 
 ```bash
-docker run -p 9000:9000 -p 50071:50071 mock-true-consensus-agent:latest
+docker run -p 9000:9000 -p 50071:50071 mock-false-consensus-agent:latest
 ```
 
 
