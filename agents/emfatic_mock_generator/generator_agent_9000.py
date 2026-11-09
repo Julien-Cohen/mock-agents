@@ -42,7 +42,7 @@ MOSAICO_OBSERVABILITY = "https://mosaico-project.eu/extensions/mosaico-observabi
 logger = logging.getLogger(__name__)
 
 
-class SampleAgentExecutor(AgentExecutor):
+class MockAgentExecutor(AgentExecutor):
 
     def __init__(self) -> None:
         self.running_tasks: set[str] = set()
@@ -124,8 +124,8 @@ class SampleAgentExecutor(AgentExecutor):
             )
             return
 
-        # Create evaluation artifact with data Part
-        evaluation_artifact = Artifact(
+        # Create solution artifact with data Part
+        solution_artifact = Artifact(
             artifact_id=str(uuid.uuid4()),
             name='solution',
             parts=[new_text_part('@namespace(uri="http://www.example.org/booksandauthors", prefix="p") package booksandauthors; class Author { attr String name; attr Integer birthYear;}')]
@@ -133,13 +133,13 @@ class SampleAgentExecutor(AgentExecutor):
         await event_queue.enqueue_event(TaskArtifactUpdateEvent(
             context_id=task.context_id,
             task_id=task.id,
-            artifact=evaluation_artifact,
+            artifact=solution_artifact,
         ))
 
         await updater.complete()
 
         logger.info(
-            '[SampleAgentExecutor] Task %s finished with state: completed',
+            '[Generator Agent] Task %s finished with state: completed',
             task_id,
         )
 
@@ -152,7 +152,7 @@ async def serve(
     grpc_port: int = 50071,
     compat_grpc_port: int = 50072,
 ) -> None:
-    """Run the Sample Agent server with mounted JSON-RPC, HTTP+JSON and gRPC transports."""
+    """Run the  Agent server with mounted JSON-RPC, HTTP+JSON and gRPC transports."""
     agent_card = AgentCard(
         name='Mock Generator Agent',
         description='A mock agent to test collaboration.',
@@ -167,11 +167,11 @@ async def serve(
         default_output_modes=['text', 'task-status'],
         skills=[
             AgentSkill(
-                id='evaluation',
+                id='generation',
                 name='Mock Agent Generation',
                 description='Gives some emfatic code (always the same)',
-                tags=['mock', 'evaluation'],
-                examples=['evaluate something'],
+                tags=['mock', 'generation'],
+                examples=['generate something'],
                 input_modes=['text'],
                 output_modes=['text', 'task-status'],
             )
@@ -212,7 +212,7 @@ async def serve(
 
     task_store = InMemoryTaskStore()
     request_handler = DefaultRequestHandler(
-        agent_executor=SampleAgentExecutor(),
+        agent_executor=MockAgentExecutor(),
         task_store=task_store,
         agent_card=agent_card,
     )
@@ -253,7 +253,7 @@ async def serve(
     config = uvicorn.Config(app, host=bind_host, port=port)
     uvicorn_server = uvicorn.Server(config)
 
-    logger.info('Starting Sample Agent servers:')
+    logger.info('Starting Mock Agent servers:')
     logger.info(' - HTTP on http://%s:%s', host, port)
     logger.info(' - gRPC on %s:%s', host, grpc_port)
     logger.info(' - gRPC (v0.3 compat) on %s:%s', host, compat_grpc_port)
@@ -272,7 +272,7 @@ async def serve(
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    parser = argparse.ArgumentParser(description='Sample A2A agent server')
+    parser = argparse.ArgumentParser(description='Mock A2A agent server')
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('--port', type=int, default=9000)
     parser.add_argument('--grpc-port', type=int, default=50071)
